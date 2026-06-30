@@ -1,0 +1,14 @@
+Node: 
+  User_id: "unique_identifier"
+  First_name: "name1"
+  Last_name: "name2"
+  Profile_picture_url: "link"
+  Email: "email_address"
+  Created_at: "when_they_joined"
+
+Edge:
+  Source: "Start Node"
+  Target: "End Node"
+  Edge_tag: "relationship tag"
+  Edge_desc: "Desc of relationship"
+  Created_at_edges: "date of start of relationship" 
