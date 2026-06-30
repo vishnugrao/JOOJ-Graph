@@ -1,6 +1,5 @@
 package api
 
-// create edge function, enforcing rules from its test file
 import (
 	"errors"
 	"regexp"
