@@ -4,3 +4,5 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: my-app
+    ports:
+      - "6767:6767"
