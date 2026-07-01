@@ -1,9 +1,10 @@
 package test
 
 import (
+	"JOOJ-Graph/backend/model"
 	"testing"
+
 	"gopkg.in/yaml.v3"
-	"github.com/abhay/JOOJ-Graph/backend/model"
 )
 
 func TestEdgeSingleFields(t *testing.T) {
@@ -25,11 +26,11 @@ func TestEdgeSingleFields(t *testing.T) {
 		Created_at:          "03/12/2026",
 	}
 	edgeAB := model.Edge{
-		Source: John,
-		Target: Jane,
-		Edge_tag: "Family",
-		Edge_desc: "Desc AB",
-		Created_at_edges: "20/08/26", 
+		Source:           John,
+		Target:           Jane,
+		Edge_tag:         "Family",
+		Edge_desc:        "Desc AB",
+		Created_at_edges: "20/08/26",
 	}
 
 	if edgeAB.Source != John {
@@ -77,11 +78,11 @@ func TestEdgeMultiplefields(t *testing.T) {
 		Email:               "JoeJo@email.com",
 		Created_at:          "02/01/2027",
 	}
-	edgeAB := model.Edge{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" }
-	edgeBA := model.Edge{ Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26" }
-	edgeAC := model.Edge{ Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27" }
-	edgeBC := model.Edge{ Source: Jane, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc BC", Created_at_edges: "21/09/27" }
-	
+	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
+	edgeBA := model.Edge{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"}
+	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}
+	edgeBC := model.Edge{Source: Jane, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc BC", Created_at_edges: "21/09/27"}
+
 	if edgeAB.Edge_tag != "Family" {
 		t.Errorf("Expected edge tag: Family, but got %s", edgeAB.Edge_tag)
 	}
@@ -126,10 +127,10 @@ func TestEdgeDuplicateEdgeDetection(t *testing.T) {
 		Created_at:          "03/12/2026",
 	}
 	edges := []model.Edge{
-	{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" },
-	{ Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26" } }
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"}}
 
-	new_edge := model.Edge{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" }
+	new_edge := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
 
 	duplicate_found := false
 	for _, edge := range edges {
@@ -161,9 +162,9 @@ func TestEdgeSelfEdgeDetection(t *testing.T) {
 		Created_at:          "03/12/2026",
 	}
 	edges := []model.Edge{
-	{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" },
-	{ Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26" },
-	{ Source: Jane, Target: Jane, Edge_tag: "NA", Edge_desc: "NA", Created_at_edges: "NA" } }
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
+		{Source: Jane, Target: Jane, Edge_tag: "NA", Edge_desc: "NA", Created_at_edges: "NA"}}
 
 	self_edge_found := false
 	for _, edge := range edges {
@@ -203,10 +204,10 @@ func TestEdgeMissingSourceTargetDetection(t *testing.T) {
 		Created_at:          "02/01/2027",
 	}
 	edges := []model.Edge{
-	{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" },
-	{ Source: John, Target: model.User_node{}, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26" },
-	{ Source: Jane, Target: Joe, Edge_tag: "Family", Edge_desc: "Desc BC", Created_at_edges: "02/12/26" },
-	{ Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27" } }
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
+		{Source: John, Target: model.User_node{}, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
+		{Source: Jane, Target: Joe, Edge_tag: "Family", Edge_desc: "Desc BC", Created_at_edges: "02/12/26"},
+		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}}
 
 	missing_SourceOrTarget := false
 	for _, edge := range edges {
@@ -221,7 +222,7 @@ func TestEdgeMissingSourceTargetDetection(t *testing.T) {
 }
 
 func TestEdgeIndependency(t *testing.T) {
-		John := model.User_node{
+	John := model.User_node{
 		User_id:             "19annahdksnHKAnskjs01192",
 		First_name:          "John",
 		Last_name:           "Doe",
@@ -245,8 +246,8 @@ func TestEdgeIndependency(t *testing.T) {
 		Email:               "JoeJo@email.com",
 		Created_at:          "02/01/2027",
 	}
-	edgeAB := model.Edge{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" }
-	edgeAC := model.Edge{ Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27" }
+	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
+	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}
 
 	edgeAC.Edge_tag = "Friend/Highschool"
 
@@ -284,9 +285,9 @@ func TestEdgeSlice(t *testing.T) {
 		Created_at:          "02/01/2027",
 	}
 	Edges := []model.Edge{
-		{ Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26" },
-		{ Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26" },
-		{ Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27" } }
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
+		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}}
 
 	if len(Edges) != 3 {
 		t.Errorf("Expected 3 edges but got %v", len(Edges))
@@ -328,4 +329,3 @@ Created_at_edges: date of start of relationship
 		t.Errorf("Expected End Node but got %s", edge1.Target)
 	}
 }
-

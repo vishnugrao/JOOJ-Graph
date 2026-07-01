@@ -1,37 +1,30 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
-	"os"
 )
 
-type Exnode struct {
-	First_name string `json:"first name"`
-	Last_name string `json:"last name"`
-	Email string `json:"Email"`
-}
-
-type ExnodeWrapper struct {
-	Exnode Exnode `json:"user"`
-}
-
+var data string
 
 func InputDump(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("data.json")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	var exnode ExnodeWrapper
-	err = json.Unmarshal(data, &exnode)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+
+	switch r.Method {
+	case http.MethodPost:
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Cannot read body...", http.StatusBadRequest)
+				return
+			}
+
+			data = string(body)
+			fmt.Fprintf(w, "Json has been stored...\n")
+
+		case http.MethodGet:
+			fmt.Fprint(w, data)
+			fmt.Println(data)
+		
 	}
 
-	fmt.Println("First name: ", exnode.Exnode.First_name)
-	fmt.Println("Last name: ", exnode.Exnode.Last_name)
-	fmt.Println("Email: ", exnode.Exnode.Email)
 }
