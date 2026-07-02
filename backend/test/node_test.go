@@ -1,17 +1,17 @@
 package test
 
 import (
-	"testing"
-	"gopkg.in/yaml.v3"
-	"github.com/abhay/JOOJ-Graph/backend/model"
+	"JOOJ-Graph/backend/model"
 	"regexp"
+	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 var (
-	valid_name = regexp.MustCompile(`^[a-zA-Z\s\-']+$`)
+	valid_name  = regexp.MustCompile(`^[a-zA-Z\s\-']+$`)
 	valid_field = regexp.MustCompile(`^\s+$`)
 	valid_email = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
-
 )
 
 func TestNodeUserFields(t *testing.T) {
@@ -189,7 +189,7 @@ func TestNodeInvalidEmail(t *testing.T) {
 
 	invalid_email := false
 	for _, user_node := range user_nodes {
-		if !valid_email.MatchString(user_node.Email)  {
+		if !valid_email.MatchString(user_node.Email) {
 			invalid_email = true
 			break
 		}
@@ -209,7 +209,7 @@ func TestNodeInvalidName(t *testing.T) {
 
 	invalid_name := false
 	for _, user_node := range user_nodes {
-		if !valid_name.MatchString(user_node.First_name) || !valid_name.MatchString(user_node.Last_name)  {
+		if !valid_name.MatchString(user_node.First_name) || !valid_name.MatchString(user_node.Last_name) {
 			invalid_name = true
 			break
 		}
@@ -238,6 +238,3 @@ func TestNodeWhiteSpaceOnly(t *testing.T) {
 		t.Errorf("Expected an invalid field containing only whitespace to be found but it was not found.")
 	}
 }
-
-
-

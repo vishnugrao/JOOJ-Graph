@@ -3,7 +3,7 @@ package api
 import (
 	"errors"
 	"regexp"
-	"github.com/abhay/JOOJ-Graph/backend/model"
+	"JOOJ-Graph/backend/model"
 )
 
 var (
