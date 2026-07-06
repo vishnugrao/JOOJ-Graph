@@ -1,10 +1,17 @@
 package api
 
 import (
-	"fmt"
-	"io"
 	"net/http"
+	"encoding/json"
+	"github.com/google/uuid"
 )
+
+type SimpleNode struct {
+	Uid string `json:"id"`
+	Firstname string `json:"first_name"`
+	Lastname string `json:"Last_name"`
+	Email string `json:"email"`
+}
 
 var data string
 
@@ -13,14 +20,15 @@ func InputDump(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
 	} else {
-		body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "Cannot read body...", http.StatusBadRequest)
-				return
-			}
+		var node SimpleNode
+		if err := json.NewDecoder(r.Body).Decode(&node); err != nil {
+			http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+			return
+		}
+		node.Uid = uuid.NewString()
 
-			data = string(body)
-			fmt.Fprint(w, data)
-			fmt.Println(data)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(node)
 	}
 }
