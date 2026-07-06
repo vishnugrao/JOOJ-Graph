@@ -1,8 +1,20 @@
 services:
-  app:
+  backend:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: my-app
+    container_name: jooj-graph-backend
     ports:
       - "6767:6767"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: jooj-graph-frontend
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_URL=http://backend:6767
