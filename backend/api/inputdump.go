@@ -1,19 +1,18 @@
-package api
+package API
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
+
 	"github.com/google/uuid"
 )
 
 type SimpleNode struct {
-	Uid string `json:"id"`
+	Uid       string `json:"id"`
 	Firstname string `json:"first_name"`
-	Lastname string `json:"Last_name"`
-	Email string `json:"email"`
+	Lastname  string `json:"Last_name"`
+	Email     string `json:"email"`
 }
-
-var data string
 
 func InputDump(w http.ResponseWriter, r *http.Request) {
 

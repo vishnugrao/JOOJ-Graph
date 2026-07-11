@@ -1,10 +1,10 @@
-package api
+package API
 
-// create edge function, enforcing rules from its test file
 import (
 	"errors"
 	"regexp"
 	"JOOJ-Graph/backend/model"
+	"time"
 )
 
 var (
@@ -12,12 +12,12 @@ var (
 	valid_no_whitespace_field = regexp.MustCompile(`^\s+$`)
 )
 
-func CreateUserEdge(Source model.User_node, Target model.User_node, Edge_tag string, Edge_desc string, Created_at_edges string) (model.Edge, error) {
-	if Source.User_id == "" || Target.User_id == "" || Edge_tag == "" || Edge_desc == "" || Created_at_edges == "" {
+func CreateUserEdge(Source model.User_node, Target model.User_node, Edge_tag string, Edge_desc string) (model.Edge, error) {
+	if Source.User_id == "" || Target.User_id == "" || Edge_tag == "" || Edge_desc == "" {
 		return model.Edge{}, errors.New("No fields can be empty, please try again...")
 	}
 
-	if valid_no_whitespace_field.MatchString(Edge_tag) || valid_no_whitespace_field.MatchString(Edge_desc) || valid_no_whitespace_field.MatchString(Created_at_edges) {
+	if valid_no_whitespace_field.MatchString(Edge_tag) || valid_no_whitespace_field.MatchString(Edge_desc) {
 		return model.Edge{}, errors.New("Invalid fields, please try again...")
 	}
 
@@ -34,7 +34,7 @@ func CreateUserEdge(Source model.User_node, Target model.User_node, Edge_tag str
 		Target: Target,
 		Edge_tag: Edge_tag,
 		Edge_desc: Edge_desc,
-		Created_at_edges: Created_at_edges }
+		Created_at_edges: time.Now().UTC().Format(time.RFC3339) }
 
 	return edge, nil
 }

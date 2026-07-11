@@ -3,7 +3,6 @@ package test
 import (
 	"JOOJ-Graph/backend/model"
 	"testing"
-
 	"gopkg.in/yaml.v3"
 )
 
