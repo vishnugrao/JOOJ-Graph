@@ -34,12 +34,12 @@ func CreateUserNode(First_name string, Last_name string, Profile_picture_url str
 		return model.User_node{}, errors.New("Invalid fields, please try again...")
 	}
 	user := model.User_node{
-		User_id:             uuid.NewString(),
-		First_name:          First_name,
-		Last_name:           Last_name,
+		User_id: uuid.NewString(),
+		First_name: First_name,
+		Last_name: Last_name,
 		Profile_picture_url: Profile_picture_url,
-		Email:               Email,
-		Created_at:          time.Now().UTC().Format(time.RFC3339)}
+		Email: Email,
+		Created_at: time.Now().UTC().Format(time.RFC3339)}
 
 	return user, nil
 }
@@ -65,3 +65,21 @@ func CreateNodeHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(node)
 	}
 }
+
+// func GetNodeHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != http.MethodGet {
+// 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+// 	} else {
+// 		name := r.URL.Query().Get("name")
+// 		if name == "" { http.Error(w, "Invalid Graph name, try again...", http.StatusBadRequest)
+// 			return }
+
+// 		graph, exists := inMemoryStore[name]
+
+// 		if !exists { http.Error(w, "Graph does not exists, try again...", http.StatusNotFound)
+// 			return }
+
+// 		w.Header().Set("Content-Type", "application/json")
+// 		json.NewEncoder(w).Encode(graph)
+// 	}
+// }

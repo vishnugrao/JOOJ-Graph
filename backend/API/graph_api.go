@@ -3,14 +3,13 @@ package API
 import (
 	"JOOJ-Graph/backend/model"
 	"encoding/json"
-	"net/http"
 	"errors"
+	// "fmt"
+	"net/http"
 )
 
 func CreateGraph(Name string) (model.Graph, error) {
-	if Name == ""{
-		return model.Graph{}, errors.New("Invalid Name, please try again...")
-	}
+	if Name == "" || valid_field.MatchString(Name) { return model.Graph{}, errors.New("Invalid Name, please try again...") }
 	graph := model.Graph{}
 	graph.Name = Name
 	graph.Nodes = []model.User_node{}
@@ -24,33 +23,94 @@ func CreateGraphHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
 	} else {
-		var graph model.Graph
-		if err := json.NewDecoder(r.Body).Decode(&graph); err != nil {
-			http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return
-		}
-		graph, err := CreateGraph(graph.Name)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+		var namereq struct { Name string `json:"name"` }
+		if err := json.NewDecoder(r.Body).Decode(&namereq); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+			return }
+		if _, exists := inMemoryStore[namereq.Name]; exists { http.Error(w, "Graph with that name already exists", http.StatusConflict)
+			return }
+
+		graph, err := CreateGraph(namereq.Name)
+		if err != nil { http.Error(w, err.Error(), http.StatusBadRequest)
+			return }
+
+		inMemoryStore[graph.Name] = graph
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(graph)
-
 	}
 }
 
-// func GraphAddNode(graph *model.Graph, node model.User_node) (model.Graph, error) {
-// 	if !graph.NodeMap[node.User_id] {
-// 		graph.Nodes = append(graph.Nodes, node)
-// 		graph.NodeMap[node.User_id] = true
-// 		return *graph, nil
-// 	} else {
-// 		return model.Graph{}, errors.New("Node already exists...")
-// 	}
-// }
+func GetGraphHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+	} else {
+		name := r.URL.Query().Get("name")
+		if name == "" { http.Error(w, "Invalid Graph name, try again...", http.StatusBadRequest)
+			return }
+
+		graph, exists := inMemoryStore[name]
+
+		if !exists { http.Error(w, "Graph does not exists, try again...", http.StatusNotFound)
+			return }
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(graph)
+	}
+}
+
+func GetAllGraphHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+		return } 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(inMemoryStore)
+}
+
+func GraphAddNode(graph *model.Graph, node model.User_node) (model.Graph, error) {
+	if !graph.NodeMap[node.User_id] {
+		graph.Nodes = append(graph.Nodes, node)
+		graph.NodeMap[node.User_id] = true
+		inMemoryStore[graph.Name] = *graph
+		return *graph, nil
+	} else {
+		return model.Graph{}, errors.New("Node already exists...")
+	}
+}
+
+func GraphAddNodeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+	} else {
+		var req struct { 
+			GraphName string `json:"graphname"`
+			NodeObj model.User_node `json:"node"` }
+			
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+			return }
+		
+		graph, exists := inMemoryStore[req.GraphName]
+		if !exists {
+			http.Error(w, "Graph does not exist...", http.StatusNotFound)
+			return }
+
+		for _, n := range graph.Nodes {
+		if n.Email == req.NodeObj.Email {
+			http.Error(w, "A node with this email already exists...", http.StatusBadRequest)
+			return } }
+
+		updatedGraph, err := GraphAddNode(&graph, req.NodeObj)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return }
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(updatedGraph)
+	}
+}
+
 
 // func GraphRemoveNode(graph *model.Graph, removeid string) (model.Graph, error) {
 // 	if graph.NodeMap[removeid] {
