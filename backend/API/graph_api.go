@@ -1,10 +1,12 @@
 package API
 
 import (
+// Internal imports
 	"JOOJ-Graph/backend/model"
+
+// External imports
 	"encoding/json"
 	"errors"
-	// "fmt"
 	"net/http"
 )
 
@@ -112,6 +114,56 @@ func GraphAddNodeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func GraphAddEdge(graph *model.Graph, edge model.Edge) (model.Graph, error) {
+	if !graph.NodeMap[edge.Source.User_id] || !graph.NodeMap[edge.Target.User_id] {
+		return model.Graph{}, errors.New("Source or Target node do not exist...")
+	}
+	if edge.Source.User_id == edge.Target.User_id {
+		return model.Graph{}, errors.New("Source and Target cannot be the same node...")
+	}
+
+	graph.Edges = append(graph.Edges, edge)
+	edge_key := edge.Source.User_id + "-" + edge.Target.User_id
+	graph.EdgeMap[edge_key] = true
+	inMemoryStore[graph.Name] = *graph
+	return *graph, nil
+}
+
+func GraphAddEdgeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+	} else {
+		var req struct { 
+			GraphName string `json:"graphname"`
+			EdgeObj model.Edge `json:"edge"` }
+			
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+			return }
+		
+		graph, exists := inMemoryStore[req.GraphName]
+		if !exists {
+			http.Error(w, "Graph does not exist...", http.StatusNotFound)
+			return }
+
+		e_key := req.EdgeObj.Source.User_id + "-" + req.EdgeObj.Target.User_id
+
+		if graph.EdgeMap[e_key] {
+			http.Error(w, "The Edge already exists...", http.StatusBadRequest)
+			return }
+
+		updatedGraph, err := GraphAddEdge(&graph, req.EdgeObj)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return }
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(updatedGraph)
+	}
+}
+
+
 // func GraphRemoveNode(graph *model.Graph, removeid string) (model.Graph, error) {
 // 	if graph.NodeMap[removeid] {
 // 		for i, node := range graph.Nodes {
@@ -136,26 +188,6 @@ func GraphAddNodeHandler(w http.ResponseWriter, r *http.Request) {
 
 // }
 
-// func GraphAddEdge(graph *model.Graph, Source model.User_node, Target model.User_node, Edge_tag string, Edge_desc string, Created_at_edges string) (model.Graph, error) {
-// 	if graph.NodeMap[Source.User_id] && graph.NodeMap[Target.User_id] {
-// 		edge_key := Source.User_id + "-" + Target.User_id
-// 		if !graph.EdgeMap[edge_key] {
-// 			edge, err := CreateUserEdge(Source, Target, Edge_tag, Edge_desc, Created_at_edges)
-// 			if err != nil {
-// 				return model.Graph{}, err
-// 			}
-// 			graph.Edges = append(graph.Edges, edge)
-// 			graph.EdgeMap[edge_key] = true
-// 			return *graph, nil
-// 		} else {
-// 			return model.Graph{}, errors.New("Edge already exists")
-// 		}
-
-// 	} else {
-// 		return model.Graph{}, errors.New("Source or Target node do not exist...")
-// 	}
-
-// }
 
 // func GraphRemoveEdge(graph *model.Graph, removeSource model.User_node, removeTarget model.User_node) (model.Graph, error) {
 // 	removeID1 := removeSource.User_id

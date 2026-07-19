@@ -1,7 +1,10 @@
 package test
 
 import (
+// Internal imports
 	"JOOJ-Graph/backend/model"
+
+// External imports
 	"testing"
 	"gopkg.in/yaml.v3"
 )
@@ -9,27 +12,24 @@ import (
 func TestEdgeSingleFields(t *testing.T) {
 
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	edgeAB := model.Edge{
-		Source:           John,
-		Target:           Jane,
-		Edge_tag:         "Family",
-		Edge_desc:        "Desc AB",
-		Created_at_edges: "20/08/26",
+		Source: John,
+		Target: Jane,
+		Edge_tag: "Family",
+		Edge_desc: "Desc AB",
 	}
 
 	if edgeAB.Source != John {
@@ -44,9 +44,6 @@ func TestEdgeSingleFields(t *testing.T) {
 	if edgeAB.Edge_desc != "Desc AB" {
 		t.Errorf("Expected edge description: Desc AB, but got %s", edgeAB.Edge_desc)
 	}
-	if edgeAB.Created_at_edges != "20/08/26" {
-		t.Errorf("Expected creation date: 20/08/26, but got %s", edgeAB.Created_at_edges)
-	}
 	if edgeAB.Source != John || edgeAB.Target != Jane {
 		t.Errorf("Expected edge direction from John to Jane, but got %s to %s", edgeAB.Source, edgeAB.Target)
 	}
@@ -54,33 +51,30 @@ func TestEdgeSingleFields(t *testing.T) {
 
 func TestEdgeMultiplefields(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	Joe := model.User_node{
-		User_id:             "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
-		First_name:          "Joe",
-		Last_name:           "Jo",
+		User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
+		First_name: "Joe",
+		Last_name: "Jo",
 		Profile_picture_url: "Placeholder3",
-		Email:               "JoeJo@email.com",
-		Created_at:          "02/01/2027",
+		Email: "JoeJo@email.com",
 	}
-	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
-	edgeBA := model.Edge{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"}
-	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}
-	edgeBC := model.Edge{Source: Jane, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc BC", Created_at_edges: "21/09/27"}
+	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"}
+	edgeBA := model.Edge{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"}
+	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC"}
+	edgeBC := model.Edge{Source: Jane, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc BC"}
 
 	if edgeAB.Edge_tag != "Family" {
 		t.Errorf("Expected edge tag: Family, but got %s", edgeAB.Edge_tag)
@@ -110,26 +104,23 @@ func TestEdgeMultiplefields(t *testing.T) {
 
 func TestEdgeDuplicateEdgeDetection(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	edges := []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
-		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"}}
-
-	new_edge := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"}}
+	new_edge := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"}
 
 	duplicate_found := false
 	for _, edge := range edges {
@@ -145,25 +136,23 @@ func TestEdgeDuplicateEdgeDetection(t *testing.T) {
 
 func TestEdgeSelfEdgeDetection(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	edges := []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
-		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
-		{Source: Jane, Target: Jane, Edge_tag: "NA", Edge_desc: "NA", Created_at_edges: "NA"}}
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"},
+		{Source: Jane, Target: Jane, Edge_tag: "NA", Edge_desc: "NA"}}
 
 	self_edge_found := false
 	for _, edge := range edges {
@@ -179,34 +168,31 @@ func TestEdgeSelfEdgeDetection(t *testing.T) {
 
 func TestEdgeMissingSourceTargetDetection(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	Joe := model.User_node{
-		User_id:             "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
-		First_name:          "Joe",
-		Last_name:           "Jo",
+		User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
+		First_name: "Joe",
+		Last_name: "Jo",
 		Profile_picture_url: "Placeholder3",
-		Email:               "JoeJo@email.com",
-		Created_at:          "02/01/2027",
+		Email: "JoeJo@email.com",
 	}
 	edges := []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
-		{Source: John, Target: model.User_node{}, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
-		{Source: Jane, Target: Joe, Edge_tag: "Family", Edge_desc: "Desc BC", Created_at_edges: "02/12/26"},
-		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}}
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
+		{Source: John, Target: model.User_node{}, Edge_tag: "Family", Edge_desc: "Desc BA"},
+		{Source: Jane, Target: Joe, Edge_tag: "Family", Edge_desc: "Desc BC"},
+		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC"}}
 
 	missing_SourceOrTarget := false
 	for _, edge := range edges {
@@ -222,31 +208,28 @@ func TestEdgeMissingSourceTargetDetection(t *testing.T) {
 
 func TestEdgeIndependency(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	Joe := model.User_node{
-		User_id:             "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
-		First_name:          "Joe",
-		Last_name:           "Jo",
+		User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
+		First_name: "Joe",
+		Last_name: "Jo",
 		Profile_picture_url: "Placeholder3",
-		Email:               "JoeJo@email.com",
-		Created_at:          "02/01/2027",
+		Email: "JoeJo@email.com",
 	}
-	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"}
-	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}
+	edgeAB := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"}
+	edgeAC := model.Edge{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC"}
 
 	edgeAC.Edge_tag = "Friend/Highschool"
 
@@ -260,42 +243,36 @@ func TestEdgeIndependency(t *testing.T) {
 
 func TestEdgeSlice(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	Joe := model.User_node{
-		User_id:             "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
-		First_name:          "Joe",
-		Last_name:           "Jo",
+		User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
+		First_name: "Joe",
+		Last_name: "Jo",
 		Profile_picture_url: "Placeholder3",
-		Email:               "JoeJo@email.com",
-		Created_at:          "02/01/2027",
+		Email: "JoeJo@email.com",
 	}
 	Edges := []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB", Created_at_edges: "20/08/26"},
-		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA", Created_at_edges: "20/08/26"},
-		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC", Created_at_edges: "11/02/27"}}
+		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
+		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"},
+		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC"}}
 
 	if len(Edges) != 3 {
 		t.Errorf("Expected 3 edges but got %v", len(Edges))
 	}
 	if Edges[0].Edge_tag != "Family" {
 		t.Errorf("Expected Family but got %s", Edges[0].Edge_tag)
-	}
-	if Edges[1].Created_at_edges != "20/08/26" {
-		t.Errorf("Expected 20/08/26 but got %s", Edges[1].Created_at_edges)
 	}
 }
 
@@ -315,7 +292,6 @@ Target:
   First_name: Jane
 Edge_tag: relationship tag
 Edge_desc: Desc of relationship
-Created_at_edges: date of start of relationship 
 `)
 
 	var edge1 model.Edge

@@ -1,7 +1,10 @@
 package API
 
 import (
+// Internal imports
 	"JOOJ-Graph/backend/model"
+
+// External imports
 	"net/http"
 )
 

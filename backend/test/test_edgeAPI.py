@@ -1,6 +1,7 @@
 import pytest
 import requests
 import json
+BACKEND_URL = "http://localhost:6767"
 
 def test_ServerReachability(add_edge_response_raw):
     assert add_edge_response_raw.status_code != 404, f"Server not reachable, got {add_edge_response_raw.status_code}"
@@ -64,9 +65,6 @@ def test_isString(add_edge_response_raw):
     assert add_edge_response_raw.status_code == 201, f"Expected 201 but got {add_edge_response_raw.status_code}"
     assert isinstance(data, str), f"Expected string but got {type(data)}"
 
-def test_nonEmptyCreatedAtDate(add_edge_response):
-    assert add_edge_response["created_at_edges"] != "", f"Expected a Created At date but got {add_edge_response["created_at_edges"]}"
-
 def test_correctPostedFields(add_edge_response, graph_withnodes_payload):
     assert add_edge_response["source"] == graph_withnodes_payload['SJ']['nodes'][0], f"Expected {graph_withnodes_payload['SJ']['nodes'][0]} but got {add_edge_response['source']}"
     assert add_edge_response["target"] == graph_withnodes_payload['SJ']['nodes'][1], f"Expected {graph_withnodes_payload['SJ']['nodes'][1]} but got {add_edge_response['target']}"
@@ -78,10 +76,14 @@ def test_invalidFields(invalid_edge_payloads):
         response = requests.post(f"http://localhost:6767/create/edge", json=payload, timeout=3)
         assert response.status_code == 400, F"Expected 400 from payload {i} but got {response.status_code}"
 
-
 def test_correctEdgeFieldTypes(add_edge_response):
     assert add_edge_response['source'] != None
     assert add_edge_response['target'] != None
     assert isinstance(add_edge_response['edge_tag'], str)
     assert isinstance(add_edge_response['edge_desc'], str)
-    assert isinstance(add_edge_response['created_at_edges'], str)
+
+def test_selfEdgeCase(graph_with_one_edge_response):
+    graph = requests.get(f"{BACKEND_URL}/get/graph?name={graph_with_one_edge_response['name']}",  timeout=5).json()
+    edge_payload = {"source" : graph['nodes'][0], "target" : graph['nodes'][0], "edge_tag": "Myself", "edge_desc" : "Birth Certificate"}
+    response = requests.post(f"{BACKEND_URL}/create/edge", json=edge_payload, timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"

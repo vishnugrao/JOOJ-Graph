@@ -1,8 +1,11 @@
 package test
 
 import (
+// Internal imports
 	api "JOOJ-Graph/backend/API"
 	"JOOJ-Graph/backend/model"
+
+// External imports
 	"testing"
 )
 

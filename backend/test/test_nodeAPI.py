@@ -68,9 +68,6 @@ def test_isString(add_node_response_raw):
 def test_nonEmptyUserID(add_node_response):
     assert add_node_response["user_id"] != "", f"Expected a generated user ID but got {add_node_response["user_id"]}"
 
-def test_nonEmptyCreatedAtDate(add_node_response):
-    assert add_node_response["Created_at"] != "", f"Expected a Created At date but got {add_node_response["Created_at"]}"
-
 def test_userIDisStr(add_node_response):
     assert isinstance(add_node_response["user_id"], str), f"Expected generated user ID to be a string but got {type(add_node_response["user_id"])}"
 
@@ -126,3 +123,26 @@ def test_updatedGraphReturned(graph_with_one_node_response):
     assert graph_with_one_node_response['name'] == 'SJ'
     assert isinstance(graph_with_one_node_response['nodes'], list)
     assert graph_with_one_node_response['nodes'][0]['Email'] == 'Jsmith@gmail.com'
+
+def test_correctlyRetrievesNode(get_node_response_raw):
+    assert get_node_response_raw.status_code == 200, f"Expected 200 but got {get_node_response_raw.status_code}"
+    assert isinstance(get_node_response_raw.text, str)
+    assert get_node_response_raw.json()['user_id'] != ''
+    assert get_node_response_raw.json()['First_name'] == 'John', f"Expected John but got {get_node_response_raw.json()['First_name']}"
+    assert get_node_response_raw.json()['Last_name'] == 'Smith', f"Expected Smith but got {get_node_response_raw.json()['Last_name']}"
+    assert get_node_response_raw.json()['Email'] == 'Jsmith@gmail.com', f"Expected Jsmith@gmail.com but got {get_node_response_raw.json()['Email']}"
+
+
+def test_missingGetNodeParams(get_node_response):
+    response = requests.get(f"{BACKEND_URL}/graph/get/node", params={"graph_name": "", "email":"Jsmith@gmail.com"}, timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+    response2 = requests.get(f"{BACKEND_URL}/graph/get/node", params={"graph_name": "SJ", "email":"Invalid"},  timeout=5)
+    assert response2.status_code == 404, f"Expected 404 but got {response2.status_code}"
+
+    response3 = requests.get(f"{BACKEND_URL}/graph/get/node", params={"graph_name": "", "email":""},  timeout=5)
+    assert response3.status_code == 400, f"Expected 400 but got {response3.status_code}"
+
+def test_wrongMethod(get_node_response):
+    response = requests.post(f"{BACKEND_URL}/graph/get/node?graph_name='SJ'&email='Jsmith@gmail.com'", timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"

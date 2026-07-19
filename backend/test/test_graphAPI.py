@@ -137,3 +137,72 @@ def test_getAllGraphsEmpty():
     data = response.json()
     assert isinstance(data, dict)
     assert len(data) == 0
+
+def test_correctlyAddedEdgeInGraph(graph_with_one_edge_response):
+    assert len(graph_with_one_edge_response['edges']) == 1, f"Expected 1 but got {len(graph_with_one_edge_response['edges'])}"
+
+def test_correctlyAddedEdgeMapInGraph(graph_with_one_edge_response):
+    edge = graph_with_one_edge_response['edges'][0]
+    edge_key = edge['source']['user_id'] + "-" + edge['target']['user_id']
+    assert edge_key in graph_with_one_edge_response['edge_map']
+    assert graph_with_one_edge_response['edge_map'][edge_key] == True
+
+def test_correctGraphEdgeFields(graph_with_one_edge_response):
+    edge = graph_with_one_edge_response['edges'][0]
+    assert edge['edge_tag'] == "Friend"
+    assert edge['edge_desc'] == "From Highschool"
+
+def test_addEdgeInvalidGraph(add_edge_response):
+    payload = {"graphname" : "Invalid", "edge" : add_edge_response}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload, timeout=3)
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_addEdgeEmptyGraph(add_edge_response):
+    payload = {"graphname" : "", "edge" : add_edge_response}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload, timeout=3)
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_invalidEdgeJsonPayload():
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", data="Invalid Json", headers={"Content-Type" : "application/json"}, timeout=3)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_duplicateGraphEdgeCase(graph_with_one_edge_response):
+    graph = requests.get(f"{BACKEND_URL}/get/graph?name={graph_with_one_edge_response['name']}",  timeout=5).json()
+
+    edge_payload = {"source" : graph['nodes'][0], "target" : graph['nodes'][1], "edge_tag": "Friend", "edge_desc" : "From Highschool"}
+    edge = requests.post(f"{BACKEND_URL}/create/edge", json=edge_payload, timeout=5).json()
+
+    payload = {"graphname" : graph['name'] , "edge" : edge}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload,  timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_selfGraphEdgeCase(graph_with_one_edge_response):
+    graph = requests.get(f"{BACKEND_URL}/get/graph?name={graph_with_one_edge_response['name']}",  timeout=5).json()
+
+    edge_payload = {"source" : graph['nodes'][0], "target" : graph['nodes'][0], "edge_tag": "Myself", "edge_desc" : "Birth Certificate"}
+
+    payload = {"graphname" : graph['name'] , "edge" : edge_payload}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload,  timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_invalidEdgeSource(graph_with_one_edge_response):
+    graph = graph_with_one_edge_response
+    fakeNode = {"user_id": "X", "First_name" : "X" , "Last_name": "X", "Email" :"X", "Profile_picture_url": ""}
+
+    edge = {"source" : fakeNode, "target" : graph_with_one_edge_response['nodes'][1], "edge_tag": "Friend", "edge_desc" : "From Highschool"}
+    payload = {"graphname" : graph['name'] , "edge" : edge}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload,  timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_invalidEdgeTarget(graph_with_one_edge_response):
+    graph = graph_with_one_edge_response
+    fakeNode = {"user_id": "X", "First_name" : "X" , "Last_name": "X", "Email" :"X", "Profile_picture_url": ""}
+
+    edge = {"source" : graph_with_one_edge_response['nodes'][0], "target" : fakeNode, "edge_tag": "Friend", "edge_desc" : "From Highschool"}
+    payload = {"graphname" : graph['name'] , "edge" : edge}
+    response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload,  timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_correctEdgeHeaderResponse(graph_with_one_edge_response_raw):
+    assert graph_with_one_edge_response_raw.status_code == 200, f"Expected 200 but got {graph_with_one_edge_response_raw}"
+    assert graph_with_one_edge_response_raw.headers['Content-Type'].startswith("application/json")

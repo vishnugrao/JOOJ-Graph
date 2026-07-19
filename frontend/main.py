@@ -52,12 +52,12 @@ def createGraph():
     try:
         response = requests.post(f"{BACKEND_URL}/create/graph", json=payload, timeout=5)
         response.raise_for_status()
+        if response.status_code == 409: print("Graph with this name already exists, please use another name...")
+        elif response.status_code == 400: print("Unexpected error occurred, please try again...")
         graph = response.json()
         return graph
     except requests.exceptions.RequestException as e:
-        if response.status_code == 409: print("Graph with this name already exists, please use another name...")
-        elif response.status_code == 400: print("Unexpected error occurred, please try again...")
-        else: print(f"\nFailed to create graph see: {e}")
+        print(f"\nFailed to create graph see: {e}")
 
 def createNode():
     first = input("\nEnter first name: ").strip()
@@ -67,19 +67,30 @@ def createNode():
     try:
         response = requests.post(f"{BACKEND_URL}/create/node", json=payload, timeout=5)
         response.raise_for_status()
+        if response.status_code == 400: print("Unexpected error occurred, please try again...")
         node = response.json()
         return node
     except requests.exceptions.RequestException as e:
-        if response.status_code == 400: print("Unexpected error occurred, please try again...")
-        else: print(f"\nFailed to create node see: {e}")
+        print(f"\nFailed to create node see: {e}")
 
 def returnAllGraphs():
     try:
         response = requests.get(f"{BACKEND_URL}/get/allgraphs", timeout=5)
+        if response.status_code == 400: print("try again...")
         return response.json()
     except requests.exceptions.RequestException as e:
+        print(f"\n Failed to fetch all graphs see: {e}")
+
+def getGraph(name: str):
+    name = str(name).strip()
+    try:
+        response = requests.get(f"{BACKEND_URL}/get/graph?name={name}", timeout=5)
         if response.status_code == 400: print("try again...")
-        else: print(f"\n Failed to fetch all graphs see: {e}")
+        elif response.status_code == 404: print("Graph does not exist, please try again...")
+        graph = response.json()
+        return graph
+    except requests.exceptions.RequestException as e:
+        print(f"\n Failed to select graph see: {e}")
 
 def selectGraph():
     graphlist = returnAllGraphs()
@@ -90,22 +101,32 @@ def selectGraph():
         name = input("\nWhich graph do you want to select?: ").strip()
 
         response = requests.get(f"{BACKEND_URL}/get/graph?name={name}", timeout=5)
+        if response.status_code == 400: print("try again...")
+        elif response.status_code == 404: print("Graph does not exist, please try again...")
         graph = response.json()
         return graph
     except requests.exceptions.RequestException as e:
-        if response.status_code == 400: print("try again...")
-        elif response.status_code == 404: print("Graph does not exist, please try again...")
-        else: print(f"\n Failed to select graph see: {e}")
+        print(f"\n Failed to select graph see: {e}")
 
 def addNodeToGraph(name, node):
     payload = {"graphname" : name , "node" : node}
     try:
         response = requests.post(f"{BACKEND_URL}/graph/add/node", json=payload,  timeout=5)
-    except requests.exceptions.RequestException as e:
         if response.status_code == 201: print(f"Node has been added to Graph {name}")
         elif response.status_code == 400: print(f"Failed to add Node to Graph {name}")
         elif response.status_code == 404: print(f"Graph {name} does not exist")
-        else: print(f"Unexpected error see: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Unexpected error see: {e}")
+
+def addEdgeToGraph(name, edge):
+    payload = {"graphname" : name , "edge" : edge}
+    try:
+        response = requests.post(f"{BACKEND_URL}/graph/add/edge", json=payload,  timeout=5)
+        if response.status_code == 201: print(f"Edge has been added to Graph {name}")
+        elif response.status_code == 400: print(f"Failed to add Edge to Graph {name}")
+        elif response.status_code == 404: print(f"Graph {name} does not exist")
+    except requests.exceptions.RequestException as e:
+        print(f"Unexpected error see: {e}")
 
 def createEdge(graph):
     nodes = graph['nodes']
@@ -152,8 +173,9 @@ def tuiScreen():
             elif opt == "graph":
                 graph = createGraph() 
                 if graph:
-                    print("\nGraph has been created")
-                    print(selectGraph())
+                    print("\nGraph has been created", getGraph(graph['name']))
+
+
             elif opt == "node":
                 allgraph = returnAllGraphs()
                 if len(allgraph) == 0:
@@ -169,35 +191,39 @@ def tuiScreen():
                         continue
                     
                     addNodeToGraph(graph['name'], node)
-                    print("\nNode has been created")
-                    print(selectGraph())
+                    print("\nNode has been created", getGraph(graph['name']))
                         
 
             elif opt == "edge":
-                # graph = selectGraph()
+                allgraph = returnAllGraphs()
+                if len(allgraph) == 0:
+                    print("Graph does not exist, please create a graph first and try again...")
+                    continue
+                else:
+                    graph = selectGraph()
+                    if len(graph['nodes']) < 2:
+                        print("Graph must have 2 or more nodes, please try again...")
+                        continue
+                    
+                    print("\nAvailable Nodes")
+                    for i, node in enumerate(graph['nodes']):
+                        print(f"{i + 1}. {node['First_name']} {node['Last_name']} {node['Email']}")
 
-                # if len(graph['nodes']) < 2:
-                #     print("Graph must have 2 or more nodes, please try again...")
-                #     continue
+                    edge = createEdge(graph)
+                    if edge is None:
+                        print("\nError occured while creating edge...")
+                        continue
 
-                # print("\nAvailable Nodes")
-                # for i, node in enumerate(graph['nodes']):
-                #     print(f"{i + 1}. {node['First_name']} {node['Last_name']} {node['Email']}")
+                    addEdgeToGraph(graph['name'], edge)
+                    print("\nEdge has been created", getGraph(graph['name']))
 
-                # edge = createEdge(graph)
-                # edge_id = f"{edge['source']['user_id']}-{edge['target']['user_id']}"
-                # if edge and edge_id not in graph['edge_map']:
-                #     graph['edges'].append(edge)
-                #     graph['edge_map'][edge_id] = True
-                #     print("\nEdge has been created")
-                print("\nEdge has been created")
+
             elif opt == "back": print("\nGoing back to menu...")
             else: print("\n Try again...")
 
         elif user =="read":
             opt = input("\nWhat do you want to read? enter 'graph'/'node'/'edge' or 'back' to go back to menu: ")
             if opt == "graph": print("\nGraph has been read")
-
             elif opt == "node": print("\nNode has been read")
             elif opt == "edge": print("\nEdge has been read")
             elif opt == "back": print("\nGoing back to menu...")

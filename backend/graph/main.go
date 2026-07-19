@@ -1,7 +1,10 @@
 package main
 
 import (
+// Internal imports
 	api "JOOJ-Graph/backend/API"
+
+// External imports
 	"fmt"
 	"net/http"
 )
@@ -16,10 +19,13 @@ func main() {
 	
 	router.HandleFunc("/reset", api.StoreResetHandler)
 	router.HandleFunc("/graph/add/node", api.GraphAddNodeHandler)
+	router.HandleFunc("/graph/add/edge", api.GraphAddEdgeHandler)
 
 	router.HandleFunc("/get/allgraphs", api.GetAllGraphHandler)
 
 	router.HandleFunc("/get/graph", api.GetGraphHandler)
+
+	router.HandleFunc("/graph/get/node", api.GetNodeHandler)
 
 	// router.HandleFunc("/read/graph", api.ReadGraphHandler) Visualization, Opens browswer to show graph
 	// router.HandleFunc("/read/node", api.ReadNodeHandler) A page with information on the node, GET request

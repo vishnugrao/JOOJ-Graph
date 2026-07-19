@@ -1,10 +1,12 @@
 package test
 
 import (
+// Internal imports
 	"JOOJ-Graph/backend/model"
+
+// External imports
 	"regexp"
 	"testing"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +23,6 @@ func TestNodeUserFields(t *testing.T) {
 		Last_name:           "name2",
 		Profile_picture_url: "link",
 		Email:               "email_address",
-		Created_at:          "when_they_joined",
 	}
 
 	if user_node.User_id != "unique_identifier" {
@@ -39,10 +40,6 @@ func TestNodeUserFields(t *testing.T) {
 	if user_node.Email != "email_address" {
 		t.Errorf("Expected email_address but got %s", user_node.Email)
 	}
-	if user_node.Created_at != "when_they_joined" {
-		t.Errorf("Expected when_they_joined but got %s", user_node.Created_at)
-	}
-
 }
 
 func TestNodeUserYamlUnmarshall(t *testing.T) {
@@ -52,7 +49,6 @@ First_name: name1
 Last_name: name2
 Profile_picture_url: link
 Email: email_address
-Created_at: when_they_joined
 `)
 
 	var user_node model.User_node
@@ -76,28 +72,25 @@ func TestNodeUserEmptyFields(t *testing.T) {
 
 func TestNodeMultipleUserNodes(t *testing.T) {
 	John := model.User_node{
-		User_id:             "19annahdksnHKAnskjs01192",
-		First_name:          "John",
-		Last_name:           "Doe",
+		User_id: "19annahdksnHKAnskjs01192",
+		First_name: "John",
+		Last_name: "Doe",
 		Profile_picture_url: "Placeholder1",
-		Email:               "JohnDoe@email.com",
-		Created_at:          "24/08/2026",
+		Email: "JohnDoe@email.com",
 	}
 	Jane := model.User_node{
-		User_id:             "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
-		First_name:          "Jane",
-		Last_name:           "Smith",
+		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA",
+		First_name: "Jane",
+		Last_name: "Smith",
 		Profile_picture_url: "Placeholder2",
-		Email:               "JaneSmith@email.com",
-		Created_at:          "03/12/2026",
+		Email: "JaneSmith@email.com",
 	}
 	Joe := model.User_node{
-		User_id:             "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
-		First_name:          "Joe",
-		Last_name:           "Jo",
+		User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9",
+		First_name: "Joe",
+		Last_name: "Jo",
 		Profile_picture_url: "Placeholder3",
-		Email:               "JoeJo@email.com",
-		Created_at:          "02/01/2027",
+		Email: "JoeJo@email.com",
 	}
 
 	if John.First_name != "John" {
@@ -122,10 +115,10 @@ func TestNodeMultipleUserNodes(t *testing.T) {
 
 func TestNodeUserNodeIndependency(t *testing.T) {
 	John := model.User_node{User_id: "19annahdksnHKAnskjs01192", First_name: "John", Last_name: "Doe",
-		Profile_picture_url: "Placeholder1", Email: "JohnDoe@email.com", Created_at: "24/08/2026"}
+		Profile_picture_url: "Placeholder1", Email: "JohnDoe@email.com"}
 	Jane := model.User_node{
 		User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith",
-		Profile_picture_url: "Placeholder2", Email: "JaneSmith@email.com", Created_at: "03/12/2026"}
+		Profile_picture_url: "Placeholder2", Email: "JaneSmith@email.com"}
 
 	John.Email = "JohnDoe123@email.com"
 
@@ -140,9 +133,9 @@ func TestNodeUserNodeIndependency(t *testing.T) {
 func TestNodeSlice(t *testing.T) {
 	user_nodes := []model.User_node{
 		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com", Created_at: "03/12/2026"},
+			Email: "JaneSmith@email.com"},
 		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: "Joe", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJo@email.com", Created_at: "02/01/2027"},
+			Email: "JoeJo@email.com"},
 	}
 
 	if len(user_nodes) != 2 {
@@ -159,13 +152,13 @@ func TestNodeSlice(t *testing.T) {
 func TestNodeNoDuplicateUserNodes(t *testing.T) {
 	user_nodes := []model.User_node{
 		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com", Created_at: "03/12/2026"},
+			Email: "JaneSmith@email.com"},
 		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: "Joe", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJo@email.com", Created_at: "02/01/2027"},
+			Email: "JoeJo@email.com"},
 	}
 
 	new_user_node := model.User_node{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-		Email: "JaneSmith@email.com", Created_at: "03/12/2026"}
+		Email: "JaneSmith@email.com"}
 
 	duplicate_found := false
 	for _, user_node := range user_nodes {
@@ -182,9 +175,9 @@ func TestNodeNoDuplicateUserNodes(t *testing.T) {
 func TestNodeInvalidEmail(t *testing.T) {
 	user_nodes := []model.User_node{
 		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com", Created_at: "03/12/2026"},
+			Email: "JaneSmith@email.com"},
 		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: "Joe", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJoemail.com", Created_at: "02/01/2027"},
+			Email: "JoeJoemail.com"},
 	}
 
 	invalid_email := false
@@ -202,9 +195,9 @@ func TestNodeInvalidEmail(t *testing.T) {
 func TestNodeInvalidName(t *testing.T) {
 	user_nodes := []model.User_node{
 		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com", Created_at: "03/12/2026"},
+			Email: "JaneSmith@email.com"},
 		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: "J0e", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJo@email.com", Created_at: "02/01/2027"},
+			Email: "JoeJo@email.com"},
 	}
 
 	invalid_name := false
@@ -222,14 +215,14 @@ func TestNodeInvalidName(t *testing.T) {
 func TestNodeWhiteSpaceOnly(t *testing.T) {
 	user_nodes := []model.User_node{
 		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com", Created_at: "03/12/2026"},
+			Email: "JaneSmith@email.com"},
 		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: " ", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJo@email.com", Created_at: "02/01/2027"},
+			Email: "JoeJo@email.com"},
 	}
 
 	invalid_field := false
 	for _, user_node := range user_nodes {
-		if valid_field.MatchString(user_node.First_name) || valid_field.MatchString(user_node.Last_name) || valid_field.MatchString(user_node.User_id) || valid_field.MatchString(user_node.Profile_picture_url) || valid_field.MatchString(user_node.Email) || valid_field.MatchString(user_node.Created_at) {
+		if valid_field.MatchString(user_node.First_name) || valid_field.MatchString(user_node.Last_name) || valid_field.MatchString(user_node.User_id) || valid_field.MatchString(user_node.Profile_picture_url) || valid_field.MatchString(user_node.Email) {
 			invalid_field = true
 			break
 		}
