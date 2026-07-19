@@ -1,0 +1,6 @@
+.jooj-env/
+*.pyc
+*.html
+__pycache__/
+.pytest_cache/
+backend/test/lib/
