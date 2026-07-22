@@ -1,13 +1,39 @@
 package test
 
 import (
-// Internal imports
+	// Internal imports
 	api "JOOJ-Graph/backend/API"
 	"JOOJ-Graph/backend/model"
 
-// External imports
+	// External imports
 	"testing"
+	"slices"
 )
+
+func TestGraphGetNodes(t *testing.T) {
+	SJ := model.Graph{}
+
+	node, err := api.CreateUserNode(
+		"John", "Doe", "Placeholder1", "JohnDoe@email.com")
+
+	if err != nil {
+		t.Errorf("Expected no error but got %v", err)
+	}
+	node2, err2 := api.CreateUserNode(
+		"Jay", "Doe", "Placeholder2", "JayDoe@email.com")
+
+	if err2 != nil {
+		t.Errorf("Expected no error but got %v", err)
+	}
+
+	SJ.Nodes = append(SJ.Nodes, node)
+	SJ.Nodes = append(SJ.Nodes, node2)
+
+	recieved_nodelist := api.GetNodes(SJ)
+	if !slices.Equal(recieved_nodelist, SJ.Nodes) {
+		t.Error("Wrong")
+	}
+}
 
 func TestGraphAddNode(t *testing.T) {
 	SJ := model.Graph{}

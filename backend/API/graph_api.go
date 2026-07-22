@@ -1,10 +1,10 @@
 package API
 
 import (
-// Internal imports
+	// Internal imports
 	"JOOJ-Graph/backend/model"
 
-// External imports
+	// External imports
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -24,41 +24,41 @@ func CreateGraph(Name string) (model.Graph, error) {
 func CreateGraphHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-	} else {
-		var namereq struct { Name string `json:"name"` }
-		if err := json.NewDecoder(r.Body).Decode(&namereq); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return }
-		if _, exists := inMemoryStore[namereq.Name]; exists { http.Error(w, "Graph with that name already exists", http.StatusConflict)
-			return }
+		return }
 
-		graph, err := CreateGraph(namereq.Name)
-		if err != nil { http.Error(w, err.Error(), http.StatusBadRequest)
-			return }
+	var namereq struct { Name string `json:"name"` }
+	if err := json.NewDecoder(r.Body).Decode(&namereq); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
+	if _, exists := inMemoryStore[namereq.Name]; exists { http.Error(w, "Graph with that name already exists", http.StatusConflict)
+		return }
 
-		inMemoryStore[graph.Name] = graph
+	graph, err := CreateGraph(namereq.Name)
+	if err != nil { http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(graph)
-	}
+	inMemoryStore[graph.Name] = graph
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(graph)
 }
 
 func GetGraphHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-	} else {
-		name := r.URL.Query().Get("name")
-		if name == "" { http.Error(w, "Invalid Graph name, try again...", http.StatusBadRequest)
-			return }
+		return }
 
-		graph, exists := inMemoryStore[name]
+	name := r.URL.Query().Get("name")
+	if name == "" { http.Error(w, "Invalid Graph name, try again...", http.StatusBadRequest)
+		return }
 
-		if !exists { http.Error(w, "Graph does not exists, try again...", http.StatusNotFound)
-			return }
+	graph, exists := inMemoryStore[name]
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(graph)
-	}
+	if !exists { http.Error(w, "Graph does not exists, try again...", http.StatusNotFound)
+		return }
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(graph)
 }
 
 func GetAllGraphHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,34 +83,34 @@ func GraphAddNode(graph *model.Graph, node model.User_node) (model.Graph, error)
 func GraphAddNodeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-	} else {
-		var req struct { 
-			GraphName string `json:"graphname"`
-			NodeObj model.User_node `json:"node"` }
-			
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return }
+		return }
+
+	var req struct { 
+		GraphName string `json:"graphname"`
+		NodeObj model.User_node `json:"node"` }
 		
-		graph, exists := inMemoryStore[req.GraphName]
-		if !exists {
-			http.Error(w, "Graph does not exist...", http.StatusNotFound)
-			return }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
+	
+	graph, exists := inMemoryStore[req.GraphName]
+	if !exists {
+		http.Error(w, "Graph does not exist...", http.StatusNotFound)
+		return }
 
-		for _, n := range graph.Nodes {
-		if n.Email == req.NodeObj.Email {
-			http.Error(w, "A node with this email already exists...", http.StatusBadRequest)
-			return } }
+	for _, n := range graph.Nodes {
+	if n.Email == req.NodeObj.Email {
+		http.Error(w, "A node with this email already exists...", http.StatusBadRequest)
+		return } }
 
-		updatedGraph, err := GraphAddNode(&graph, req.NodeObj)
+	updatedGraph, err := GraphAddNode(&graph, req.NodeObj)
 
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(updatedGraph)
-	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(updatedGraph)
 }
 
 
@@ -132,78 +132,168 @@ func GraphAddEdge(graph *model.Graph, edge model.Edge) (model.Graph, error) {
 func GraphAddEdgeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-	} else {
-		var req struct { 
-			GraphName string `json:"graphname"`
-			EdgeObj model.Edge `json:"edge"` }
-			
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return }
+		return }
+
+	var req struct { 
+		GraphName string `json:"graphname"`
+		EdgeObj model.Edge `json:"edge"` }
 		
-		graph, exists := inMemoryStore[req.GraphName]
-		if !exists {
-			http.Error(w, "Graph does not exist...", http.StatusNotFound)
-			return }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
+	
+	graph, exists := inMemoryStore[req.GraphName]
+	if !exists {
+		http.Error(w, "Graph does not exist...", http.StatusNotFound)
+		return }
 
-		e_key := req.EdgeObj.Source.User_id + "-" + req.EdgeObj.Target.User_id
+	e_key := req.EdgeObj.Source.User_id + "-" + req.EdgeObj.Target.User_id
 
-		if graph.EdgeMap[e_key] {
-			http.Error(w, "The Edge already exists...", http.StatusBadRequest)
-			return }
+	if graph.EdgeMap[e_key] {
+		http.Error(w, "The Edge already exists...", http.StatusBadRequest)
+		return }
 
-		updatedGraph, err := GraphAddEdge(&graph, req.EdgeObj)
+	updatedGraph, err := GraphAddEdge(&graph, req.EdgeObj)
 
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(updatedGraph)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(updatedGraph)
+}
+
+// func DeleteGraph(graph *model.Graph) (model.Graph, error){
+// 	if  {
+// 		return model.Graph{}, errors.New("Graph does not exist")
+// 	}
+// }
+
+
+func GraphRemoveNode(graph *model.Graph, node model.User_node) (model.Graph, error) {
+	if !graph.NodeMap[node.User_id] {
+		return model.Graph{}, errors.New("Node does not exist...")
 	}
+	for i, n := range graph.Nodes {
+		if n.User_id == node.User_id {
+			graph.Nodes = append(graph.Nodes[:i], graph.Nodes[i+1:]...)
+			delete(graph.NodeMap, node.User_id)
+			break
+		}
+	}
+
+	for i := len(graph.Edges) - 1; i >= 0; i-- {
+		if graph.Edges[i].Source.User_id == node.User_id || graph.Edges[i].Target.User_id == node.User_id {
+			delete(graph.EdgeMap, graph.Edges[i].Source.User_id+"-"+graph.Edges[i].Target.User_id)
+			delete(graph.EdgeMap, graph.Edges[i].Target.User_id+"-"+graph.Edges[i].Source.User_id)
+			graph.Edges = append(graph.Edges[:i], graph.Edges[i+1:]...)
+		}
+	}
+	inMemoryStore[graph.Name] = *graph
+	return *graph, nil
+} 
+
+func GraphRemoveNodeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+		return }
+	var req struct { 
+		GraphName string `json:"graphname"`
+		NodeObj model.User_node `json:"node"` }
+		
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
+	
+	graph, exists := inMemoryStore[req.GraphName]
+	if !exists {
+		http.Error(w, "Graph does not exist...", http.StatusNotFound)
+		return }
+	
+	found := false
+	for _, n := range graph.Nodes {
+	if n.Email == req.NodeObj.Email {
+		req.NodeObj = n
+		found = true
+		break } }
+
+	if !found {
+	http.Error(w, "A node with this email does not exist...", http.StatusNotFound)
+	return }
+
+	updatedGraph, err := GraphRemoveNode(&graph, req.NodeObj)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedGraph)
 }
 
 
-// func GraphRemoveNode(graph *model.Graph, removeid string) (model.Graph, error) {
-// 	if graph.NodeMap[removeid] {
-// 		for i, node := range graph.Nodes {
-// 			if node.User_id == removeid {
-// 				graph.Nodes = append(graph.Nodes[:i], graph.Nodes[i+1:]...)
-// 				delete(graph.NodeMap, removeid)
-// 				break
-// 			}
-// 		}
+func GraphRemoveEdge(graph *model.Graph, edge model.Edge) (model.Graph, error) {
+	removeID1 := edge.Source.User_id
+	removeID2 := edge.Target.User_id
+	removekey := removeID1 + "-" + removeID2
 
-// 		for i := len(graph.Edges) - 1; i >= 0; i-- {
-// 			if graph.Edges[i].Source.User_id == removeid || graph.Edges[i].Target.User_id == removeid {
-// 				delete(graph.EdgeMap, graph.Edges[i].Source.User_id+"-"+graph.Edges[i].Target.User_id)
-// 				delete(graph.EdgeMap, graph.Edges[i].Target.User_id+"-"+graph.Edges[i].Source.User_id)
-// 				graph.Edges = append(graph.Edges[:i], graph.Edges[i+1:]...)
-// 			}
-// 		}
-// 		return *graph, nil
-// 	} else {
-// 		return model.Graph{}, errors.New("Node does not exist...")
-// 	}
+	if !graph.EdgeMap[removekey] {
+		return model.Graph{}, errors.New("Edge does not exist")
+	}
 
-// }
+	for i := len(graph.Edges) - 1; i >= 0; i-- {
+		if graph.Edges[i].Source.User_id == removeID1 && graph.Edges[i].Target.User_id == removeID2 {
+			delete(graph.EdgeMap, graph.Edges[i].Source.User_id+"-"+graph.Edges[i].Target.User_id)
+			graph.Edges = append(graph.Edges[:i], graph.Edges[i+1:]...)
+		}
+	}
+	inMemoryStore[graph.Name] = *graph
+	return *graph, nil
+}
 
+func GraphRemoveEdgeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid Method...", http.StatusBadRequest)
+		return }
+	var req struct { 
+		GraphName string `json:"graphname"`
+		EdgeObj model.Edge `json:"edge"` }
+		
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
+	
+	graph, exists := inMemoryStore[req.GraphName]
+	if !exists {
+		http.Error(w, "Graph does not exist...", http.StatusNotFound)
+		return }
 
-// func GraphRemoveEdge(graph *model.Graph, removeSource model.User_node, removeTarget model.User_node) (model.Graph, error) {
-// 	removeID1 := removeSource.User_id
-// 	removeID2 := removeTarget.User_id
+	if req.EdgeObj.Source.User_id == "" || req.EdgeObj.Target.User_id == "" {
+		http.Error(w, "Edge must have a Source and a Target...", http.StatusBadRequest)
+		return }
+	
+	if req.EdgeObj.Source.User_id == req.EdgeObj.Target.User_id{
+		http.Error(w, "The source and target node cannot be the same...", http.StatusBadRequest)
+		return }
 
-// 	removekey := removeID1 + "-" + removeID2
+	if !graph.NodeMap[req.EdgeObj.Source.User_id] || !graph.NodeMap[req.EdgeObj.Target.User_id] {
+		http.Error(w, "Source or Target node do not exist in this graph", http.StatusNotFound)
+		return }
 
-// 	if graph.EdgeMap[removekey] {
-// 		for i := len(graph.Edges) - 1; i >= 0; i-- {
-// 			if graph.Edges[i].Source.User_id == removeID1 && graph.Edges[i].Target.User_id == removeID2 {
-// 				delete(graph.EdgeMap, graph.Edges[i].Source.User_id+"-"+graph.Edges[i].Target.User_id)
-// 				graph.Edges = append(graph.Edges[:i], graph.Edges[i+1:]...)
-// 			}
-// 		}
-// 		return *graph, nil
-// 	} else {
-// 		return model.Graph{}, errors.New("Edge does not exist")
-// 	}
-// }
+	edge_key := req.EdgeObj.Source.User_id + "-" + req.EdgeObj.Target.User_id
+	if !graph.EdgeMap[edge_key]{
+		http.Error(w, "Edge does not exist in this graph", http.StatusNotFound)
+		return }
+	
+	updatedGraph, err := GraphRemoveEdge(&graph, req.EdgeObj)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedGraph)
+}
+
+func GetNodes(graph model.Graph) []model.User_node {
+	// todo
+	list := graph.Nodes
+	return list
+}

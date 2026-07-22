@@ -41,20 +41,20 @@ func CreateEdgeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-	} else {
-		var edge model.Edge
-		if err := json.NewDecoder(r.Body).Decode(&edge); err != nil {
-			http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return
-		}
-		edge, err := CreateUserEdge(edge.Source, edge.Target, edge.Edge_tag, edge.Edge_desc)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+		return }
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(edge)
+	var edge model.Edge
+	if err := json.NewDecoder(r.Body).Decode(&edge); err != nil {
+		http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return
 	}
+	edge, err := CreateUserEdge(edge.Source, edge.Target, edge.Edge_tag, edge.Edge_desc)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(edge)
 }

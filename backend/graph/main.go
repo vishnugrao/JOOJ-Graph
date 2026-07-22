@@ -12,14 +12,17 @@ import (
 func main() {
 
 	router := http.NewServeMux()
+	router.HandleFunc("/reset", api.StoreResetHandler)	
 
 	router.HandleFunc("/create/graph", api.CreateGraphHandler)
 	router.HandleFunc("/create/node", api.CreateNodeHandler)
 	router.HandleFunc("/create/edge", api.CreateEdgeHandler)
 	
-	router.HandleFunc("/reset", api.StoreResetHandler)
 	router.HandleFunc("/graph/add/node", api.GraphAddNodeHandler)
 	router.HandleFunc("/graph/add/edge", api.GraphAddEdgeHandler)
+
+	router.HandleFunc("/graph/delete/node", api.GraphRemoveNodeHandler)
+	router.HandleFunc("/graph/delete/edge", api.GraphRemoveEdgeHandler)
 
 	router.HandleFunc("/get/allgraphs", api.GetAllGraphHandler)
 

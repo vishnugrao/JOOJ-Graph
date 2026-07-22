@@ -206,3 +206,119 @@ def test_invalidEdgeTarget(graph_with_one_edge_response):
 def test_correctEdgeHeaderResponse(graph_with_one_edge_response_raw):
     assert graph_with_one_edge_response_raw.status_code == 200, f"Expected 200 but got {graph_with_one_edge_response_raw}"
     assert graph_with_one_edge_response_raw.headers['Content-Type'].startswith("application/json")
+
+def test_correctlyRemovesGraphNode(graph_with_one_node_response):
+    payload = {"graphname": graph_with_one_node_response["name"], "node": graph_with_one_node_response["nodes"][0]}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)
+    assert response.status_code == 200, f"Expected 200 but got {response.status_code}"
+    graph = response.json()
+    assert len(graph['node_map']) == 0, f"Expected 0 keys in the node map but got {len(graph['node_map'])}"
+    assert len(graph['nodes']) == 0, f"Expected 0 nodes in the nodes list but got {len(graph['nodes'])}"
+    assert response.headers["Content-Type"].startswith("application/json")
+
+def test_removeNodeFromInvalidGraph(graph_with_one_node_response):
+    node = graph_with_one_node_response['nodes'][0]
+    payload = {"graphname": "Invalid", "node": node}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeFakeNodefromGraph(graph_with_one_node_response):
+    fakeNode = {"user_id": "X", "First_name" : "X" , "Last_name": "X", "Email" :"X", "Profile_picture_url": ""}
+    payload = {"graphname": graph_with_one_node_response['name'], "node": fakeNode}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeNodeFromEmptyGraphName(graph_with_one_node_response):
+    node = graph_with_one_node_response['nodes'][0]
+    payload = {"graphname": "", "node": node}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeNodeInvalidJson():
+    response = requests.post(f"http://localhost:6767/graph/delete/node", data="Invalid Json", headers={"Content-Type":"application/json"}, timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_correctlyRemovedNodeDeletesEdges(graph_with_one_edge_response):
+    node = graph_with_one_edge_response["nodes"][0]
+    payload = {"graphname": graph_with_one_edge_response["name"], "node": node}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)
+    assert response.status_code == 200, f"Expected 200 but got {response.status_code}"
+    graph = response.json()
+    assert len(graph['edges']) == 0, f"Expected 0 but got {len(graph['edges'])}"
+    assert len(graph['edge_map']) == 0, f"Expected 0 but got {len(graph['edge_map'])}"
+    assert len(graph['nodes']) == 1, f"Expected 1 but got {len(graph['nodes'])}"
+    assert graph['nodes'][0]['Email'] != node['Email']
+
+def test_removesSameNodeTwice(graph_with_one_node_response):
+    graph = graph_with_one_node_response
+    node = graph['nodes'][0]
+    payload = {"graphname": graph["name"], "node": node}
+    successful_response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)
+    assert successful_response.status_code == 200, f"Expected 200 but got {successful_response.status_code}"
+
+    fail_response = requests.post(f"{BACKEND_URL}/graph/delete/node", json=payload,  timeout=5)
+    assert fail_response.status_code == 404, f"Expected 404 but got {fail_response.status_code}"
+
+def test_correctlyRemovesGraphEdge(graph_with_one_edge_response):
+    payload = {"graphname": graph_with_one_edge_response["name"], "edge": graph_with_one_edge_response["edges"][0]}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert response.status_code == 200, f"Expected 200 but got {response.status_code}"
+    graph = response.json()
+    assert len(graph['edge_map']) == 0, f"Expected 0 keys in the edge map but got {len(graph['edge_map'])}"
+    assert len(graph['edges']) == 0, f"Expected 0 edges in the edge list but got {len(graph['edges'])}"
+    assert len(graph['node_map']) == 2, f"Expected 2 keys in the node map but got {len(graph['node_map'])}"
+    assert len(graph['nodes']) == 2, f"Expected 2 nodes in the nodes list but got {len(graph['nodes'])}"
+    assert response.headers["Content-Type"].startswith("application/json")
+
+def test_removeEdgeFromInvalidGraph(graph_with_one_edge_response):
+    edge = graph_with_one_edge_response['nodes'][0]
+    payload = {"graphname": "Invalid", "edge": edge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeFakeEdgefromGraph(graph_with_one_edge_response):
+    fakeEdge = {'source': {'user_id': 'X', 'First_name': 'X', 'Last_name': 'X', 'Profile_picture_url': '', 'Email': 'X'}, 'target': {'user_id': 'Y', 'First_name': 'Y', 'Last_name': 'Y', 'Profile_picture_url': '', 'Email': 'Y'}, 'edge_tag': 'X', 'edge_desc': 'X'}
+    payload = {"graphname": graph_with_one_edge_response['name'], "edge": fakeEdge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeEdgeFromEmptyGraphName(graph_with_one_edge_response):
+    edge = graph_with_one_edge_response['edges'][0]
+    payload = {"graphname": "", "edge": edge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)    
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeEdgeInvalidJson():
+    response = requests.post(f"http://localhost:6767/graph/delete/edge", data="Invalid Json", headers={"Content-Type":"application/json"}, timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_removesSameEdgeTwice(graph_with_one_edge_response):
+    graph = graph_with_one_edge_response
+    edge = graph['edges'][0]
+    payload = {"graphname": graph["name"], "edge": edge}
+    successful_response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert successful_response.status_code == 200, f"Expected 200 but got {successful_response.status_code}"
+
+    fail_response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert fail_response.status_code == 404, f"Expected 404 but got {fail_response.status_code}"
+
+def test_removeSelfEdge(graph_with_one_edge_response):
+    node = graph_with_one_edge_response['nodes'][0]
+    fakeEdge = {'source': node, 'target': node, 'edge_tag': 'X', 'edge_desc': 'X'}
+    payload = {"graphname": graph_with_one_edge_response["name"], "edge": fakeEdge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
+
+def test_removeEdgeFakeSourceNode(graph_with_one_edge_response):
+    fakeNode = {"user_id": "X", "First_name" : "X" , "Last_name": "X", "Email" :"X", "Profile_picture_url": ""}
+    edge = {'source': fakeNode, 'target': graph_with_one_edge_response['nodes'][0], 'edge_tag': 'Family', 'edge_desc': 'From Highschool'}
+    payload = {"graphname": graph_with_one_edge_response["name"], "edge": edge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"
+
+def test_removeEdgeFakeTargetNode(graph_with_one_edge_response):
+    fakeNode = {"user_id": "X", "First_name" : "X" , "Last_name": "X", "Email" :"X", "Profile_picture_url": ""}
+    edge = {'source': graph_with_one_edge_response['nodes'][0], 'target': fakeNode, 'edge_tag': 'Family', 'edge_desc': 'From Highschool'}
+    payload = {"graphname": graph_with_one_edge_response["name"], "edge": edge}
+    response = requests.post(f"{BACKEND_URL}/graph/delete/edge", json=payload,  timeout=5)
+    assert response.status_code == 404, f"Expected 404 but got {response.status_code}"

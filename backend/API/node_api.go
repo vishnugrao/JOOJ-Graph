@@ -45,24 +45,22 @@ func CreateNodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid Method...", http.StatusBadRequest)
-		return
-	} else {
-		var node model.User_node
-		
-		if err := json.NewDecoder(r.Body).Decode(&node); err != nil {
-			http.Error(w, "Invalid JSON...", http.StatusBadRequest)
-			return }
+		return }
+	var node model.User_node
+	
+	if err := json.NewDecoder(r.Body).Decode(&node); err != nil {
+		http.Error(w, "Invalid JSON...", http.StatusBadRequest)
+		return }
 
-		node, err := CreateUserNode(node.First_name, node.Last_name, node.Profile_picture_url, node.Email)
+	node, err := CreateUserNode(node.First_name, node.Last_name, node.Profile_picture_url, node.Email)
 
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return }
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(node)
-	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(node)
 }
 
 func GetNodeHandler(w http.ResponseWriter, r *http.Request) {
