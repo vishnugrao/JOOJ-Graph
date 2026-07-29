@@ -7,7 +7,6 @@ import(
 
 	// External Imports
 	"testing"
-	"regexp"
 )
 
 func TestCreateGraph(t *testing.T) {
@@ -32,8 +31,7 @@ func TestDuplicateCreateGraph(t *testing.T) {
 
 func TestCreateGraphInvalidGraphNames(t *testing.T) {
 	Gm := logic.JoojGraphManager{InMemoryStore: make(map[string]model.Graph)}
-	NonWhtSpc_Field := regexp.MustCompile(`^\s+$`)
-
+	
 	Gm.CreateGraph("")
 	if _, exists := Gm.InMemoryStore[""]; exists{
 		t.Errorf("Graph name should not be empty")

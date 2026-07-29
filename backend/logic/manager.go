@@ -3,7 +3,10 @@ package logic
 import (
 	// Internal Imports
 	"JOOJ-Graph/backend/model"
-	"fmt"
+
+	// External Imports
+	"errors"
+	"regexp"
 )
 
 type GraphManager interface{
@@ -15,15 +18,20 @@ type JoojGraphManager struct{
 	InMemoryStore map[string]model.Graph 
 }
 
-func (j JoojGraphManager) CreateGraph(Name string){
+func (j JoojGraphManager) CreateGraph(Name string) error {
 	Graph := model.Graph{
 		Name : Name,
 	}
-	// if Name == "" || Name == "" // whitespace check{fmt.Println("Invalid Graph name, please use another name...")}
-	if _, exists := j.InMemoryStore[Name]; exists { // change this to else if after top line is written...
-		fmt.Println("Graph with this name already exists, please use another name...")
+	NonWhtSpc_Field := regexp.MustCompile(`^\s+$`)
+
+
+	if Name == "" || NonWhtSpc_Field.MatchString(Name) {
+		return errors.New("Graph Name should not be empty, please use another name...")
+	} else if _, exists := j.InMemoryStore[Name]; exists {
+		return errors.New("Graph with this name already exists, please use another name...")
 	} else {
 		j.InMemoryStore[Name] = Graph
+		return nil
 	}
 }
 
