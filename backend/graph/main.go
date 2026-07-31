@@ -1,17 +1,14 @@
 package main
 
 import (
+	// External Imports
 	"fmt"
 	"net/http"
-
-	api "JOOJ-Graph/backend/API"
 )
 
 func main() {
 
 	router := http.NewServeMux()
-
-	router.HandleFunc("/input/dump", api.InputDump)
 
 	fmt.Println("Server running on port 6767...")
 	if err := http.ListenAndServe(":6767", router); err != nil {
