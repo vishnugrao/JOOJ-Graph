@@ -33,8 +33,7 @@ func CreateUserNode(User_id string, First_name string, Last_name string, Profile
 		First_name: First_name,
 		Last_name: Last_name,
 		Profile_picture_url: Profile_picture_url,
-		Email: Email,
-		Created_at: Created_at }
+		Email: Email}
 
 	return user, nil
 }

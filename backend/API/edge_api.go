@@ -33,8 +33,7 @@ func CreateUserEdge(Source model.User_node, Target model.User_node, Edge_tag str
 		Source: Source,
 		Target: Target,
 		Edge_tag: Edge_tag,
-		Edge_desc: Edge_desc,
-		Created_at_edges: Created_at_edges }
+		Edge_desc: Edge_desc }
 
 	return edge, nil
 }
