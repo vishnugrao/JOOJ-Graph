@@ -32,10 +32,6 @@ var (
 		Profile_picture_url: "Placeholder3",
 		Email:               "JoeJo@email.com",
 	}
-
-	edges = []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
-		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"}}
 )
 
 func TestEdgeInvalidFields(t *testing.T) {
