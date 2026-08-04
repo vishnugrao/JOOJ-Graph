@@ -3,6 +3,7 @@ package test
 import (
 	// Internal Imports
 	"JOOJ-Graph/backend/model"
+	"JOOJ-Graph/backend/logic"
 
 	// External Imports
 	"testing"
@@ -35,67 +36,46 @@ var (
 	edges = []model.Edge{
 		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
 		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"}}
-
-	self_edges = []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
-		{Source: Jane, Target: John, Edge_tag: "Family", Edge_desc: "Desc BA"},
-		{Source: Jane, Target: Jane, Edge_tag: "NA", Edge_desc: "NA"}}
-
-	missing_nodes_edges = []model.Edge{
-		{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"},
-		{Source: John, Target: model.User_node{}, Edge_tag: "Family", Edge_desc: "Desc BA"},
-		{Source: Jane, Target: Joe, Edge_tag: "Family", Edge_desc: "Desc BC"},
-		{Source: John, Target: Joe, Edge_tag: "Friend", Edge_desc: "Desc AC"}}
 )
 
-func TestEdgeDuplicateEdgeDetection(t *testing.T) {
-	new_edge := model.Edge{Source: John, Target: Jane, Edge_tag: "Family", Edge_desc: "Desc AB"}
-
-	duplicate_found := false
-	for _, edge := range edges {
-		if edge.Source == new_edge.Source && edge.Target == new_edge.Target {
-			duplicate_found = true
-			break
-		}
+func TestEdgeInvalidFields(t *testing.T) {
+	_, exists := logic.CreateEdge(Jane, John, "", "Highschool")
+	if exists == nil {
+		t.Errorf("Edge Tag should not be empty.")
 	}
-	if !duplicate_found {
-		t.Errorf("Expected a duplicate edge to be found but it was not found.")
+
+	_, exists2 := logic.CreateEdge(John, Jane, " ", "Highschool")
+	if exists2 == nil {
+		t.Errorf("Edge Tag should not be whitespace.")
+	}
+
+	_, exists3 := logic.CreateEdge(Joe, John, "Friend", "")
+	if exists3 == nil {
+		t.Errorf("Edge description should not be empty.")
+	}
+
+	_, exists4 := logic.CreateEdge(John, Joe, "Friend", " ")
+	if exists4 == nil {
+		t.Errorf("Edge description should not be whitespace.")
+	}
+
+	_, exists5 := logic.CreateEdge(John, Joe, "Fr1end?", "From Highschool")
+	if exists5 == nil {
+		t.Errorf("Edge tag should only contain alphabet letters and forward slash.")
 	}
 }
 
 func TestEdgeSelfEdgeDetection(t *testing.T) {
-
-
-	self_edge_found := false
-	for _, edge := range self_edges {
-		if edge.Source == edge.Target {
-			self_edge_found = true
-			break
-		}
-	}
-	if !self_edge_found {
-		t.Errorf("Expected a self edge to be found but it was not found.")
+	_, exists := logic.CreateEdge(John, John, "Myself", "Became concious.")
+	if exists == nil {
+		t.Errorf("The source and target cannot be the same node.")
 	}
 }
 
 func TestEdgeMissingSourceTargetDetection(t *testing.T) {
-	missing_SourceOrTarget := false
-	for _, edge := range missing_nodes_edges {
-		if edge.Source.User_id == "" || edge.Target.User_id == "" {
-			missing_SourceOrTarget = true
-			break
-		}
-	}
-	if !missing_SourceOrTarget {
-		t.Errorf("Expected a missing source or target to be found but it was not found.")
-	}
-}
-
-func TestEdgeEmptyFields(t *testing.T) {
-	edgeAB := model.Edge{}
-
-	if edgeAB.Edge_desc != "" {
-		t.Errorf("Expected empty edge description but got %s", edgeAB.Edge_desc)
+	_, exists := logic.CreateEdge(model.User_node{}, Jane, "Friend", "From Highschool")
+	if exists == nil {
+		t.Errorf("Expected no edge to be created but got an edge.")
 	}
 }
 // SAME ARE WE STILL USING THIS?
