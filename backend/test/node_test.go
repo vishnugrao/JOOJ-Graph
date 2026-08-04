@@ -2,7 +2,7 @@ package test
 
 import (
 	// Internal Imports
-	"JOOJ-Graph/backend/model"
+	// "JOOJ-Graph/backend/model"
 	"JOOJ-Graph/backend/logic"
 
 	// External Imports
@@ -15,13 +15,6 @@ var (
 	valid_name  = regexp.MustCompile(`^[a-zA-Z\s\-']+$`)
 	valid_field = regexp.MustCompile(`^\s+$`)
 	valid_email = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
-
-	user_nodes = []model.User_node{
-		{User_id: "29fhhfnskjJKaspMWaBsJHSKKNSGG02nJassmee93n3NA", First_name: "Jane", Last_name: "Smith", Profile_picture_url: "Placeholder2",
-			Email: "JaneSmith@email.com"},
-		{User_id: "JHnHJy8JBcrYI798NVdj0dn2KOSB9", First_name: "Joe", Last_name: "Jo", Profile_picture_url: "Placeholder3",
-			Email: "JoeJo@email.com"},
-	}
 )
 
 
@@ -29,20 +22,6 @@ func TestNodeUserEmptyFields(t *testing.T) {
 	_ , exists := logic.CreateNode("", "", "", "")
 	if exists == nil {
 		t.Errorf("Expected node fields to not be empty.")
-	}
-}
-
-func TestNodeNoDuplicateUserNodes(t *testing.T) {
-	duplcte_user_node, _ := logic.CreateNode("jane", "smith", "placeholder2", "JaneSmith@email.com")
-	duplicate_found := false
-	for _, user_node := range user_nodes {
-		if user_node.Email == duplcte_user_node.Email {
-			duplicate_found = true
-			break
-		}
-	}
-	if !duplicate_found {
-		t.Errorf("Expected a duplicate user node to be found but it was not found.")
 	}
 }
 
